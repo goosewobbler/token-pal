@@ -63,7 +63,7 @@ const AddressStatus = ({ status, tokenInfo, address, onExplorerClick, explorerNa
 
   return (
     <Alert variant={status === 'loading' ? 'default' : isValid ? 'default' : 'destructive'} className='min-h-[72px]'>
-      <div className='flex items-center gap-2'>
+      <div className='flex items-center gap-2 mt-1'>
         {getStatusIcon()}
         <AlertDescription className='flex-1'>
           {status === 'loading' ? (
