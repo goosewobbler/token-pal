@@ -15,6 +15,7 @@ import { useClipboard } from '@/hooks/useClipboard';
 import { useAddressAnalysis } from '@/hooks/useAddressAnalysis';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import type { ServiceLink } from '@/entrypoints/popup/types';
+import { useCurrentTab } from '@/hooks/useCurrentTab';
 
 interface MainScreenProps {
   address: string;
@@ -41,6 +42,7 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
   } = useSettings();
 
   const { isAnalyzing, analysis: tokenInfo, analyzeAddress, isValid } = useAddressAnalysis();
+  const { url, isLoading: isTabLoading } = useCurrentTab();
 
   // Load last address on mount
   useEffect(() => {
@@ -98,6 +100,14 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
   useEffect(() => {
     setIsClipboardEnabled(true);
   }, []);
+
+  // When tab URL loads, analyze it
+  useEffect(() => {
+    if (url && !isTabLoading) {
+      setAddress(url);
+      handleAddressUpdate(url);
+    }
+  }, [url, isTabLoading]);
 
   const handleAddressUpdate = useCallback(
     (address: string) => {

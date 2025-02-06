@@ -6,7 +6,7 @@ export default defineConfig({
     name: 'Trench Buddy',
     description: 'Quick access to blockchain explorers and analytics tools',
     version: '1.0.0',
-    permissions: ['clipboardRead', 'tabs', 'storage'],
+    permissions: ['clipboardRead', 'tabs', 'storage', 'activeTab'],
     action: {
       default_popup: 'popup.html',
     },
