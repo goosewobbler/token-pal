@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Settings2, ExternalLink, ClipboardPaste } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -11,24 +11,23 @@ import TokenLinks from '@/components/TokenLinks';
 import { SERVICES } from '@/entrypoints/popup/services';
 import { useSettings } from '@/contexts/SettingsContext';
 import { browser } from 'wxt/browser';
-import { useClipboard } from '@/hooks/useClipboard';
-import { useAddressAnalysis } from '@/hooks/useAddressAnalysis';
+import { useAddressInput } from '@/hooks/useAddressInput';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip';
 import type { ServiceLink } from '@/entrypoints/popup/types';
-import { useCurrentTab } from '@/hooks/useCurrentTab';
 
 interface MainScreenProps {
   address: string;
   onOpenSettings: () => void;
 }
 
-const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps) => {
-  const [address, setAddress] = useState(initialAddress);
+const MainScreen = ({ onOpenSettings }: MainScreenProps) => {
+  const [address, setAddress] = useState('');
   const [inputState, setInputState] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [serviceLinks, setServiceLinks] = useState<ServiceLink[]>([]);
   const [socialLinks, setSocialLinks] = useState<ServiceLink[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isClipboardEnabled, setIsClipboardEnabled] = useState(true);
+  const previousAddressRef = useRef<string>('');
 
   const {
     showLabels,
@@ -42,24 +41,100 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
   } = useSettings();
 
   const { isAnalyzing, analysis: tokenInfo, analyzeAddress, isValid } = useAddressAnalysis();
-  const { url, isLoading: isTabLoading } = useCurrentTab();
 
-  // Load last address on mount
+  // Define handleAddressUpdate first
+  const handleAddressUpdate = useCallback(
+    (address: string) => {
+      setInputState('idle');
+      setServiceLinks([]);
+      setSocialLinks([]);
+      analyzeAddress(address);
+    },
+    [analyzeAddress],
+  );
+
+  // Define handleInputChange
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setAddress(value);
+      setIsTyping(true);
+      setIsClipboardEnabled(false); // Disable on manual input
+      setServiceLinks([]);
+      setSocialLinks([]);
+
+      const timeoutId = setTimeout(() => {
+        setIsTyping(false);
+        // Check if manually entered content is a URL
+        if (value.startsWith('http')) {
+          const matchesAnyService = Object.values(SERVICES).some((service) => service.urlPattern?.test(value));
+          if (!matchesAnyService) {
+            // For manually typed non-matching URLs, set invalid state and clear analysis
+            setInputState('invalid');
+            setServiceLinks([]);
+            setSocialLinks([]);
+            // Reset token info by triggering analysis with empty string
+            analyzeAddress('');
+            return;
+          }
+        }
+        handleAddressUpdate(value);
+      }, 300);
+
+      return () => {
+        clearTimeout(timeoutId);
+        setIsTyping(false);
+      };
+    },
+    [handleAddressUpdate, analyzeAddress],
+  );
+
+  // Then define handleNewContent which depends on handleAddressUpdate
+  const handleNewContent = useCallback(
+    (content: string) => {
+      // Check if content is a URL
+      if (content.startsWith('http')) {
+        // Check if URL matches any of our service patterns
+        const matchesAnyService = Object.values(SERVICES).some((service) => service.urlPattern?.test(content));
+
+        if (!matchesAnyService) {
+          // For auto-read/pasted non-matching URLs, just keep state idle
+          setInputState('idle');
+          return;
+        }
+      }
+
+      // Update address for non-URLs or matching service URLs
+      setAddress(content);
+
+      const extracted = extractAddress(content);
+      if (!extracted.invalid) {
+        handleAddressUpdate(content);
+      } else if (previousAddressRef.current) {
+        // Fall back to previous address if new content is invalid
+        setAddress(previousAddressRef.current);
+        handleAddressUpdate(previousAddressRef.current);
+      }
+    },
+    [handleAddressUpdate],
+  );
+
+  // Load last address but don't set it immediately
   useEffect(() => {
     browser.storage.local.get('lastAddress').then((result) => {
-      if (result.lastAddress) {
-        setAddress(result.lastAddress as string);
-        handleAddressUpdate(result.lastAddress as string);
-      }
+      previousAddressRef.current = (result.lastAddress as string) || '';
     });
   }, []);
 
-  // Store address when it changes
+  useAddressInput(autoReadClipboard && isClipboardEnabled, handleNewContent);
+
+  // Store address when it changes and is valid
   useEffect(() => {
-    if (address.trim()) {
+    if (address.trim() && inputState === 'valid') {
       browser.storage.local.set({ lastAddress: address });
+      previousAddressRef.current = address;
     }
-  }, [address]);
+  }, [address, inputState]);
 
   // Update input state when analysis validation changes
   useEffect(() => {
@@ -87,9 +162,6 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
       const serviceLinks = await getServiceLinks(extractedAddress, servicePrefs, tokenInfo);
       const socialLinks = getSocialLinks(tokenInfo);
 
-      console.log('serviceLinks', serviceLinks);
-      console.log('socialLinks', socialLinks);
-
       setServiceLinks(serviceLinks);
       setSocialLinks(socialLinks);
     };
@@ -100,63 +172,6 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
   useEffect(() => {
     setIsClipboardEnabled(true);
   }, []);
-
-  // When tab URL loads, analyze it
-  useEffect(() => {
-    if (url && !isTabLoading) {
-      setAddress(url);
-      handleAddressUpdate(url);
-    }
-  }, [url, isTabLoading]);
-
-  const handleAddressUpdate = useCallback(
-    (address: string) => {
-      setInputState('idle');
-      setServiceLinks([]);
-      setSocialLinks([]);
-      analyzeAddress(address);
-    },
-    [analyzeAddress],
-  );
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAddress(value);
-    setIsTyping(true);
-    setIsClipboardEnabled(false); // Disable on manual input
-    setServiceLinks([]);
-    setSocialLinks([]);
-    const timeoutId = setTimeout(() => {
-      setIsTyping(false);
-      handleAddressUpdate(value);
-    }, 300);
-
-    return () => {
-      clearTimeout(timeoutId);
-      setIsTyping(false);
-    };
-  };
-
-  const handleClipboardContent = useCallback(
-    (text: string) => {
-      setAddress(text);
-      handleAddressUpdate(text);
-    },
-    [handleAddressUpdate],
-  );
-
-  // Setup clipboard monitoring
-  useClipboard(autoReadClipboard && isClipboardEnabled, handleClipboardContent, address);
-
-  const handlePasteClick = useCallback(async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setIsClipboardEnabled(true); // Re-enable on paste button click
-      handleClipboardContent(text);
-    } catch (err) {
-      console.error('Failed to paste:', err);
-    }
-  }, [handleClipboardContent]);
 
   const handleExplorerClick = useCallback(() => {
     if (!tokenInfo.chain) return;
@@ -210,6 +225,20 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
     return SERVICES[preferredExplorer]?.name || '';
   }, [tokenInfo, preferredExplorers]);
 
+  const handlePasteClick = useCallback(async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      // Don't reset input state if pasting the same content
+      if (text === address) {
+        return;
+      }
+      setIsClipboardEnabled(true); // Re-enable on paste button click
+      handleNewContent(text);
+    } catch (err) {
+      console.error('Failed to paste:', err);
+    }
+  }, [handleNewContent, address]);
+
   return (
     <Card>
       <CardHeader className='space-y-1'>
@@ -219,12 +248,12 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
             <AutoReadIndicator enabled={autoReadClipboard && isClipboardEnabled} />
           </div>
           <Button variant='ghost' size='icon' onClick={onOpenSettings}>
-            <Settings2 className='h-4 w-4' />
+            <Settings2 className='w-4 h-4' />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className='flex space-x-2 mb-4'>
+        <div className='flex mb-4 space-x-2'>
           <div className='relative flex-1'>
             <Input
               type='text'
@@ -241,24 +270,26 @@ const MainScreen = ({ address: initialAddress, onOpenSettings }: MainScreenProps
               )}
             />
           </div>
-          <TooltipProvider>
-            <Tooltip delayDuration={1000}>
-              <TooltipTrigger asChild>
-                <Button size='icon' variant='ghost' onClick={handlePasteClick} className='hover:bg-muted'>
-                  <ClipboardPaste className='h-4 w-4' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Paste from clipboard</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {!autoReadClipboard && (
+            <TooltipProvider>
+              <Tooltip delayDuration={1000}>
+                <TooltipTrigger asChild>
+                  <Button size='icon' variant='ghost' onClick={handlePasteClick} className='hover:bg-muted'>
+                    <ClipboardPaste className='w-4 h-4' />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Paste from clipboard</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {isFastClickMode && (
             <TooltipProvider>
               <Tooltip delayDuration={1000}>
                 <TooltipTrigger asChild>
                   <Button size='icon' variant='ghost' onClick={handleOpenServicesClick} className='hover:bg-muted'>
-                    <ExternalLink className='h-4 w-4' />
+                    <ExternalLink className='w-4 h-4' />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

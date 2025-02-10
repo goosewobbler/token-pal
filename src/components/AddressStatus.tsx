@@ -69,7 +69,7 @@ const AddressStatus = ({ status, tokenInfo, address, onExplorerClick, explorerNa
           {status === 'loading' ? (
             <div className='flex flex-col gap-0.5'>
               <div className='text-sm font-medium text-foreground'>Analyzing address...</div>
-              <div className='text-xs text-foreground/80 flex items-center gap-1'>
+              <div className='flex items-center gap-1 text-xs text-foreground/80'>
                 <span>CA:</span>
                 {formatAddress(address)}
               </div>
@@ -77,7 +77,7 @@ const AddressStatus = ({ status, tokenInfo, address, onExplorerClick, explorerNa
           ) : status === 'error' ? (
             <div className='flex flex-col gap-0.5'>
               <div className='text-sm font-semibold text-red-500'>Invalid address or chain not supported</div>
-              <div className='text-xs text-red-500/90 flex items-center gap-1'>
+              <div className='flex items-center gap-1 text-xs text-red-500/90'>
                 <span>CA:</span>
                 {formatAddress(address)}
               </div>
@@ -92,7 +92,7 @@ const AddressStatus = ({ status, tokenInfo, address, onExplorerClick, explorerNa
                     </span>
                   )}
                   {name && (
-                    <span className='text-foreground/90 flex-shrink'>
+                    <span className='flex-shrink text-foreground/90'>
                       (<span className='truncate min-w-0 max-w-[200px]'>{name}</span>)
                     </span>
                   )}
@@ -126,7 +126,7 @@ const AddressStatus = ({ status, tokenInfo, address, onExplorerClick, explorerNa
                     <TooltipTrigger asChild>
                       <Button
                         variant='link'
-                        className='px-1 h-auto font-medium text-foreground/90'
+                        className='h-auto px-1 font-medium text-foreground/90'
                         onClick={handleExplorerClick}
                       >
                         <span className='flex items-center gap-1'>

@@ -1,15 +1,16 @@
-import { ClipboardCopy } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ClipboardCheck } from 'lucide-react';
 
 interface AutoReadIndicatorProps {
   enabled: boolean;
 }
 
 const AutoReadIndicator = ({ enabled }: AutoReadIndicatorProps) => {
+  if (!enabled) return null;
+
   return (
     <div className='flex items-center gap-1 text-xs text-muted-foreground'>
-      <ClipboardCopy className={cn('w-3 h-3', enabled ? 'text-green-500' : 'text-gray-400')} />
-      <span>Auto-read {enabled ? 'active' : 'disabled'}</span>
+      <ClipboardCheck className='w-3 h-3' />
+      <span>Auto-read active</span>
     </div>
   );
 };
