@@ -91,7 +91,7 @@ const App = () => {
   const [chain, setChain] = useState<Chain | undefined>(ChainNames.solana);
   const [showLabels, setShowLabels] = useState(() => getStoredValue('showLabels', true));
   const [isFastClickMode, setIsFastClickMode] = useState(() => getStoredValue('isFastClickMode', true));
-  const [autoReadClipboard, setAutoReadClipboard] = useState(() => getStoredValue('autoReadClipboard', true));
+  const [autoReadClipboard, setAutoReadClipboard] = useState(() => getStoredValue('autoReadClipboard', false));
   const [serviceColumns, setServiceColumns] = useState(() => getStoredValue('serviceColumns', 3));
   const [showLinks, setShowLinks] = useState(() => getStoredValue('showLinks', true));
   const [servicePrefs, setServicePrefs] = useState(() => getStoredValue('servicePrefs', defaultServicePrefs));
