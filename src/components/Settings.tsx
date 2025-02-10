@@ -119,20 +119,20 @@ const Settings = ({ onClose }: SettingsProps) => {
   };
 
   return (
-    <Card className='w-full rounded-none border-0 p-0'>
+    <Card className='w-full p-0 border-0 rounded-none'>
       <CardHeader className='flex flex-row items-center justify-between'>
         <div className='flex items-center gap-4'>
           <CardTitle className='text-lg font-bold'>Settings</CardTitle>
           <AutoReadIndicator enabled={autoReadClipboard} />
         </div>
         <Button variant='ghost' size='icon' onClick={onClose}>
-          <X className='h-4 w-4' />
+          <X className='w-4 h-4' />
         </Button>
       </CardHeader>
       <CardContent className='space-y-4'>
         <Tabs value={activeTab} className='w-full'>
           <TabsHeader
-            className='w-full rounded-md bg-muted p-1'
+            className='w-full p-1 rounded-md bg-muted'
             indicatorProps={{
               className: 'bg-transparent',
             }}
@@ -224,6 +224,7 @@ const Settings = ({ onClose }: SettingsProps) => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Automatically read addresses from clipboard without having to paste.</p>
+                            <p>Setting this option disables reading the URL from the current tab.</p>
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -324,7 +325,7 @@ const Settings = ({ onClose }: SettingsProps) => {
                         {Object.entries(CHAINS).map(([key, chain]) => (
                           <SelectItem key={key} value={key}>
                             <span className='flex items-center gap-2'>
-                              <div className='w-4 h-4 flex items-center justify-center'>{chain.icon}</div>
+                              <div className='flex items-center justify-center w-4 h-4'>{chain.icon}</div>
                               {chain.name}
                             </span>
                           </SelectItem>
@@ -350,7 +351,7 @@ const Settings = ({ onClose }: SettingsProps) => {
                       {getChainExplorers().map((explorer) => (
                         <SelectItem key={explorer} value={explorer}>
                           <span className='flex items-center gap-2'>
-                            <div className='w-4 h-4 flex items-center justify-center'>{SERVICES[explorer].icon}</div>
+                            <div className='flex items-center justify-center w-4 h-4'>{SERVICES[explorer].icon}</div>
                             {SERVICES[explorer].name}
                           </span>
                         </SelectItem>
@@ -389,7 +390,7 @@ const Settings = ({ onClose }: SettingsProps) => {
                         {Object.entries(CHAINS).map(([key, chain]) => (
                           <SelectItem key={key} value={key}>
                             <span className='flex items-center gap-2'>
-                              <div className='w-4 h-4 flex items-center justify-center'>{chain.icon}</div>
+                              <div className='flex items-center justify-center w-4 h-4'>{chain.icon}</div>
                               {chain.name}
                             </span>
                           </SelectItem>
@@ -401,8 +402,8 @@ const Settings = ({ onClose }: SettingsProps) => {
                 <CardContent>
                   <div className='grid grid-cols-[1fr,auto,auto] gap-4'>
                     <div className='text-sm font-medium text-muted-foreground'>Service</div>
-                    <div className='text-sm font-medium text-muted-foreground text-center'>Display</div>
-                    <div className='text-sm font-medium text-muted-foreground text-center'>Fast-Click</div>
+                    <div className='text-sm font-medium text-center text-muted-foreground'>Display</div>
+                    <div className='text-sm font-medium text-center text-muted-foreground'>Fast-Click</div>
 
                     {getChainServices().map(([name, service]) => (
                       <React.Fragment key={name}>
@@ -410,7 +411,7 @@ const Settings = ({ onClose }: SettingsProps) => {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div className='flex items-center gap-2 cursor-help'>
-                                <div className='w-4 h-4 flex items-center justify-center'>
+                                <div className='flex items-center justify-center w-4 h-4'>
                                   {service.icon || <ExternalLink className='w-4 h-4' />}
                                 </div>
                                 <span className='text-sm'>{SERVICES[name as keyof typeof SERVICES].name || name}</span>
