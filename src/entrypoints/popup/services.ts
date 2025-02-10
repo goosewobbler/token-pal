@@ -196,8 +196,8 @@ export const SERVICES: Record<string, ServiceInfo> = {
     icon: SolanaIcon(),
     description: 'Solana blockchain explorer',
     supportedChains: [ChainNames.solana],
-    url: ({ baseToken, tokenAddress }: TokenInfo) => `https://solscan.io/address/${baseToken || tokenAddress}`,
-    urlPattern: new RegExp(`solscan\\.io/address/(${ADDRESS_PATTERNS.SOLANA})`),
+    url: ({ baseToken, tokenAddress }: TokenInfo) => `https://solscan.io/token/${baseToken || tokenAddress}`,
+    urlPattern: new RegExp(`solscan\\.io/token/(${ADDRESS_PATTERNS.SOLANA})`),
   },
   [ServiceNames.birdeye]: {
     name: 'Birdeye',
@@ -498,7 +498,7 @@ export const SERVICES: Record<string, ServiceInfo> = {
     urlPattern: new RegExp(`photon\\.tinyastro\\.io\\/\\w+\\/lp\\/(${ADDRESS_PATTERNS.EVM})`),
   },
   [ServiceNames.photonSol]: {
-    name: 'Photon SOL',
+    name: 'Photon',
     type: ServiceType.DEX,
     icon: PhotonIcon(),
     description: 'View Solana token analytics on Photon',
