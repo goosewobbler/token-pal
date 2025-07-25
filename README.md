@@ -1,4 +1,4 @@
-# Trench Buddy
+# Token Pal
 
 A browser extension to help save altcoin trench warriors a few clicks.  Copy a contract address, service URL or ticker and open the extension to get started.
 
