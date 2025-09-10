@@ -1,4 +1,10 @@
-# Token Pal
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/goosewobbler/token-pal/main/resources/token-pal-hero.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/goosewobbler/token-pal/main/resources/token-pal-hero.png">
+  <img alt="token pal hero image" src="https://raw.githubusercontent.com/goosewobbler/token-pal/main/resources/token-pal-hero.png" style="max-height: 415px;">
+</picture>
+
+<h1 align="center">Token Pal</h1>
 
 A browser extension to help save altcoin trench warriors a few clicks.  Copy a contract address, service URL or ticker and open the extension to get started.
 
