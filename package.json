@@ -5,9 +5,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "clean": "pnpm clean:output && pnpx shx rm -rf node_modules",
+    "clean:output": "wxt clean",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
-    "clean": "wxt clean",
     "build": "wxt build",
     "build:firefox": "wxt build -b firefox",
     "lint": "biome lint",
