@@ -11,12 +11,13 @@ export default defineConfig({
       default_popup: 'popup.html',
     },
   },
-  chromiumArgs: ['--user-data-dir=./user-data'],
+  runner: {
+    chromiumArgs: ['--user-data-dir=./.user-data'],
+  },
   srcDir: 'src',
   alias: {
     '@': resolve(__dirname, './src'),
   },
-  extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
   vite: () => ({
     resolve: {
