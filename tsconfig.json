@@ -6,8 +6,8 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
-    "target": "esnext",
-    "lib": ["esnext", "DOM"],
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
