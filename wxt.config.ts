@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   manifest: {
-    name: 'Trench Buddy',
+    name: 'Token Pal',
     description: 'Quick access to blockchain explorers and analytics tools',
     version: '1.0.0',
     permissions: ['clipboardRead', 'tabs', 'storage', 'activeTab'],
@@ -11,12 +11,13 @@ export default defineConfig({
       default_popup: 'popup.html',
     },
   },
+  chromiumArgs: ['--user-data-dir=./user-data'],
   srcDir: 'src',
   alias: {
     '@': resolve(__dirname, './src'),
   },
   extensionApi: 'chrome',
-  modules: ['@wxt-dev/module-react', '@wxt-dev/auto-icons'],
+  modules: ['@wxt-dev/module-react'],
   vite: () => ({
     resolve: {
       alias: {
@@ -25,3 +26,4 @@ export default defineConfig({
     },
   }),
 });
+

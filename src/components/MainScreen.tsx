@@ -242,9 +242,9 @@ const MainScreen = ({ onOpenSettings }: MainScreenProps) => {
   return (
     <Card>
       <CardHeader className='space-y-1'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <CardTitle className='text-2xl'>Trench Buddy</CardTitle>
+        <div className='flex justify-between items-center'>
+          <div className='flex gap-2 items-center'>
+            <CardTitle className='text-2xl'>Token Pal</CardTitle>
             <AutoReadIndicator enabled={autoReadClipboard && isClipboardEnabled} />
           </div>
           <Button variant='ghost' size='icon' onClick={onOpenSettings}>
