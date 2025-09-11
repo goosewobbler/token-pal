@@ -1,5 +1,5 @@
 // import { browser } from 'wxt/browser'
-import { defineBackground } from 'wxt/sandbox';
+import { defineBackground } from 'wxt/utils/define-background';
 
 export default defineBackground(() => {
   // browser.action.onClicked.addListener(async (tab) => {
