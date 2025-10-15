@@ -6,7 +6,7 @@
 
 <h1 align="center">Token Pal</h1>
 
-A browser extension to help save altcoin trench warriors a few clicks.  Copy a contract address, service URL or ticker and open the extension to get started.
+A browser extension to streamline trading & research workflows for altcoin trench warriors.  Copy a contract address, service URL or ticker and open the extension to get started.
 
 ## Features
 
